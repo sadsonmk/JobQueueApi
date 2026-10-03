@@ -1,5 +1,5 @@
 # JobQueueApi
-A REST API where authenticated users submit background jobs for processing by workers.
+A REST API where authenticated users submit background jobs (data processing tasks). Jobs are queued, processed asynchronously by workers, and users track status in real time. Includes retries, rate limiting, caching, and full observability
 
 # architecture diagram
 Client → FastAPI (REST) → PostgreSQL
