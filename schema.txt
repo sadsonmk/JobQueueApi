@@ -1,0 +1,10 @@
+# User
+id, email, hashed_password, is_active, created_at
+
+# Job
+id (uuid), user_id (fk), type, payload (JSONB), status (enum: queued/running/succeeded/failed/cancelled),
+result (JSONB, nullable), error (text, nullable), attempts (int, default 0), max_attempts (int, default 3),
+queued_at, started_at, finished_at, created_at
+
+# JobEvent
+id, job_id (fk), from_status, to_status, message, created_at
