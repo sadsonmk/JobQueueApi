@@ -1,6 +1,9 @@
+import sqlalchemy
 from fastapi import FastAPI
+from app.routers import health
 
-app = FastAPI()
+app = FastAPI(title="JobQueue API", version="0.1.0")
+app.include_router(health.router)
 
 @app.get('/')
 def home():
