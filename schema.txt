@@ -14,3 +14,7 @@ id, job_id (fk), from_status, to_status, message, created_at
 2. Queue (Redis)      — holds the message until a worker picks it up
 3. Worker (arq)       — separate process: pulls message, sets status=running,
                         does the work, writes result, sets status=succeeded/failed
+
+Register:  POST /auth/register  → hash password → save User (never store plaintext)
+Login:     POST /auth/login     → verify hash → issue JWT (signed with SECRET_KEY)
+Protected: any route            → decode JWT from Authorization header → load User
