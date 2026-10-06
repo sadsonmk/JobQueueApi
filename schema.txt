@@ -8,3 +8,9 @@ queued_at, started_at, finished_at, created_at
 
 # JobEvent
 id, job_id (fk), from_status, to_status, message, created_at
+
+1. API (FastAPI)      — receives request, validates, writes Job row (status=queued),
+                        pushes a message to Redis, returns 202 + job ID immediately
+2. Queue (Redis)      — holds the message until a worker picks it up
+3. Worker (arq)       — separate process: pulls message, sets status=running,
+                        does the work, writes result, sets status=succeeded/failed
