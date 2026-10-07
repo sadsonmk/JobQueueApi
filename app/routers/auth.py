@@ -4,12 +4,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 
-from app.core.security import create_access_token, hash_password, verify_password
+from app.core.security import create_access_token, hash_password, verify_password, decode_access_token
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.token import Token
 from app.schemas.user import UserCreate, UserResponse
-from app.core.security import decode_access_token
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 bearer = HTTPBearer(auto_error=False)
