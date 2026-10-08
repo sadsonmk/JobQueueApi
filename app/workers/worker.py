@@ -45,6 +45,8 @@ async def process_job(ctx, job_id: str) -> None:
         try:
             if job.type == JobType.TEXT_ANALYZE:
                 result = await process_text(job.payload)
+            elif job.type == JobType.ALWAYS_FAIL:
+                raise RuntimeError("intentional failure for retry testing")
             else:
                 raise ValueError(f"Unknown job type: {job.type}")
 

@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import ForeignKey, Text
+from sqlalchemy import ForeignKey, Text, DateTime
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -27,10 +27,10 @@ class Job(Base):
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
     attempts: Mapped[int] = mapped_column(default=0)
     max_attempts: Mapped[int] = mapped_column(default=3)
-    queued_at: Mapped[datetime] = mapped_column(default=utcnow)
-    started_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    finished_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    created_at: Mapped[datetime] = mapped_column(default=utcnow)
+    queued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True),default=utcnow)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True),nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True),nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True),default=utcnow)
 
     user: Mapped["User"] = relationship(back_populates="jobs")
     events: Mapped[list["JobEvent"]] = relationship(

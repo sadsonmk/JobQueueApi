@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -22,6 +22,6 @@ class JobEvent(Base):
     from_status: Mapped[JobStatus | None] = mapped_column(nullable=True)
     to_status: Mapped[JobStatus]
     message: Mapped[str | None] = mapped_column(nullable=True)
-    created_at: Mapped[datetime] = mapped_column(default=utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True),default=utcnow)
 
     job: Mapped["Job"] = relationship(back_populates="events")
