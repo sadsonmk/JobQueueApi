@@ -1,8 +1,8 @@
 import uuid
 
 from arq.connections import ArqRedis, create_pool, RedisSettings
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, status, Query
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -13,6 +13,8 @@ from app.models.job_event import JobEvent
 from app.models.user import User
 from app.routers.auth import get_current_user
 from app.schemas.job import JobCreate, JobEventResponse, JobResponse
+from app.schemas.job import JobListResponse
+from app.core.rate_limit import rate_limit_jobs
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 
@@ -25,7 +27,7 @@ async def get_arq_pool() -> ArqRedis:
         await pool.close()
 
 
-@router.post("", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED)
+@router.post("", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED, dependencies=[Depends(rate_limit_jobs)])
 async def create_job(
     data: JobCreate,
     current_user: User = Depends(get_current_user),
@@ -76,12 +78,20 @@ async def get_job_events(
     return result.scalars().all()
 
 
-@router.get("", response_model=list[JobResponse])
+@router.get("", response_model=JobListResponse)
 async def list_jobs(
+    skip: int = 0,
+    limit: int = Query(default=20, le=100),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(
-        select(Job).where(Job.user_id == current_user.id).order_by(Job.created_at.desc())
+    base = select(Job).where(Job.user_id == current_user.id)
+    total = await db.scalar(
+        select(func.count()).select_from(base.subquery())
     )
-    return result.scalars().all()
+    result = await db.execute(
+        base.order_by(Job.created_at.desc()).offset(skip).limit(limit)
+    )
+    return JobListResponse(
+        items=result.scalars().all(), total=total, skip=skip, limit=limit
+    )

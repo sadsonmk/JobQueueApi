@@ -34,3 +34,9 @@ class JobEventResponse(BaseModel):
     to_status: JobStatus
     message: str | None
     created_at: datetime
+
+class JobListResponse(BaseModel):
+    items: list[JobResponse]
+    total: int
+    skip: int
+    limit: int
